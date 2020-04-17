@@ -4,39 +4,54 @@ namespace App\Classes;
 
 class NumberManager
 {
-    private $maxValues;
+    private $maxValuesInSeries;
+    private $temporarySeries;
 
-    public function getMaxValues($testCases)
+    public function getMaxValuesInSeriesWithGivenSizes($testCases)
     {
-        foreach($this->filterTestCases($testCases) as $testCase)
-        {
-            $this->maxValues[$testCase] = $this->maxValueInSeries($testCase);
-        }
+        $notEmptyTestCases = $this->removeEmptyTestCases($testCases);
+        $this->countMaxValueForEachSeries($notEmptyTestCases);
 
-        return $this->displayMaxValues();
+        return $this->displaySizeOfSeriesAndMaxValues();
     }
 
-    private function maxValueInSeries($lastIndex)
+    private function countMaxValueForEachSeries($seriesSizes)
+    {
+        foreach($seriesSizes as $n)
+        {
+            $this->maxValuesInSeries[$n] = $this->getMaxValueInSeries($n);
+        }
+    }
+
+    private function getMaxValueInSeries($seriesSize)
     {
         $maxValue = 1;
-        $series = [0, 1];
-        for($currentIndex = 2; $currentIndex <= $lastIndex; $currentIndex++)
-        {
-            $currentValue = $this->getCurrentValue($series, $currentIndex);
-            array_push($series, $currentValue);
+        $this->temporarySeries = [0, 1];
 
-            if ($currentValue > $maxValue)
-                $maxValue = $currentValue;
+        for($seriesIndex = 2; $seriesIndex <= $seriesSize; $seriesIndex++)
+        {
+            $newElement = $this->countNewElement($seriesIndex);    
+            $maxValue = $this->getTempMaxValue($newElement, $maxValue);
         }
         return $maxValue;
     }
 
-    private function getCurrentValue($series, $currentIndex)
+    private function getTempMaxValue($newElement, $maxValue)
     {
-        return $currentIndex % 2 === 0 ? $series[$currentIndex / 2] : $series[($currentIndex - 1) / 2] + $series[$currentIndex / 2 + 1]; 
+        if ($newElement > $maxValue)
+            $maxValue = $newElement;
+        
+        return $maxValue;
     }
 
-    private function filterTestCases($testCases)
+    private function countNewElement($seriesIndex)
+    {
+         $newElement = $seriesIndex % 2 === 0 ? $$this->temporarySeries[$seriesIndex / 2] : $this->temporarySeries[($seriesIndex - 1) / 2] + $this->temporarySeries[$seriesIndex / 2 + 1]; 
+         array_push($this->temporarySeries, $newElement);
+         return $newElement;
+    }
+
+    private function removeEmptyTestCases($testCases)
     {
         return array_filter($testCases, function ($value)
         {
@@ -44,10 +59,10 @@ class NumberManager
         });
     }
 
-    private function displayMaxValues()
+    private function displaySizeOfSeriesAndMaxValues()
     {
         $results = '';
-        foreach((array)$this->maxValues as $key => $value)
+        foreach((array)$this->maxValuesInSeries as $key => $value)
             $results .= 'For test case n = ' . $key . ' max value = ' . $value . PHP_EOL; 
 
         return $results;

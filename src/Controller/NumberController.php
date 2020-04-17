@@ -26,7 +26,7 @@ class NumberController extends AbstractController
         $result = '';
         if ($form->isSubmitted() && $form->isValid()) {
             $formData = $form->getData();
-            $result = $numberManager->getMaxValues($formData);
+            $result = $numberManager->getMaxValuesInSeriesWithGivenSizes($formData);
         }
 
        return $this->render('home/showForm.html.twig', [

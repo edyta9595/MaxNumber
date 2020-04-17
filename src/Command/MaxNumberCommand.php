@@ -53,7 +53,7 @@ class MaxNumberCommand extends Command
             }
             array_push($testCases, $answer);
         }
-            $result = $this->numberManager->getMaxValues($testCases);
+            $result = $this->numberManager->getMaxValuesFromSeriesWithGivenSizes($testCases);
             $io->success($result);
     
         return 0;
